@@ -227,6 +227,9 @@ public:
   /// Emit functions to separate sections.
   unsigned FunctionSections : 1;
 
+  /// madmachine, Emit data to separate sections.
+  unsigned DataSections : 1;
+
   /// The maximum number of bytes used on a stack frame for stack promotion
   /// (includes alloc_stack allocations).
   unsigned StackPromotionSizeLimit = 1024;
@@ -351,6 +354,8 @@ public:
         DisableLLVMOptzns(false), DisableSwiftSpecificLLVMOptzns(false),
         DisableLLVMSLPVectorizer(false), Playground(false),
         EmitStackPromotionChecks(false), FunctionSections(false),
+        // madmachine, add construction for data data_sections
+        DataSections(false),
         PrintInlineTree(false), EmbedMode(IRGenEmbedMode::None),
         LLVMLTOKind(IRGenLLVMLTOKind::None), HasValueNamesSetting(false),
         ValueNames(false), EnableReflectionMetadata(true),
