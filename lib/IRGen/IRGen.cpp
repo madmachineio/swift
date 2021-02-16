@@ -166,6 +166,9 @@ swift::getIRTargetOptions(const IRGenOptions &Opts, ASTContext &Ctx) {
   TargetOpts.DebuggerTuning = llvm::DebuggerKind::LLDB;
   TargetOpts.FunctionSections = Opts.FunctionSections;
 
+  // madmachine
+  TargetOpts.DataSections = Opts.DataSections;
+
   auto *Clang = static_cast<ClangImporter *>(Ctx.getClangModuleLoader());
 
   // WebAssembly doesn't support atomics yet, see https://bugs.swift.org/browse/SR-12097

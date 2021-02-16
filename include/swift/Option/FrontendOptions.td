@@ -360,6 +360,11 @@ def function_sections: Flag<["-"], "function-sections">,
   Flags<[FrontendOption, NoInteractiveOption]>,
   HelpText<"Emit functions to separate sections.">;
 
+// madmachine, add data-sections
+def data_sections : Flag<["-"], "data-sections">,
+  Flags<[FrontendOption, NoInteractiveOption]>,
+  HelpText<"Emit data to separate sections (ELF only)">;
+
 def stack_promotion_checks : Flag<["-"], "emit-stack-promotion-checks">,
   HelpText<"Emit runtime checks for correct stack promotion of objects.">;
 
