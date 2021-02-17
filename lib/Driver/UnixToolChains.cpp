@@ -441,3 +441,20 @@ std::string toolchains::Cygwin::getTargetForLinker() const { return ""; }
 std::string toolchains::OpenBSD::getDefaultLinker() const {
   return "lld";
 }
+
+// madmachine, MadMachine toolchain tools
+std::string toolchains::MadMachine::getDefaultLinker() const {
+  return "arm-none-eabi-ld";
+}
+
+ToolChain::InvocationInfo
+toolchains::MadMachine::constructInvocation(const InterpretJobAction &job,
+                                             const JobContext &context) const {
+  llvm_unreachable("InterpretJobAction not implemented for MadMachine toolchain");
+}
+
+ToolChain::InvocationInfo
+toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
+                                             const JobContext &context) const {
+  llvm_unreachable("DynamicLinkJobAction not implemented for MadMachine toolchain");
+}

@@ -52,6 +52,8 @@ static const SupportedConditionalValue SupportedConditionalCompilationOSs[] = {
   "Cygwin",
   "Haiku",
   "WASI",
+  // madmachine
+  "MadMachine",
 };
 
 static const SupportedConditionalValue SupportedConditionalCompilationArches[] = {
@@ -287,6 +289,15 @@ std::pair<bool, bool> LangOptions::setTarget(llvm::Triple triple) {
     break;
   case llvm::Triple::WASI:
     addPlatformConditionValue(PlatformConditionKind::OS, "WASI");
+    break;
+  // madmachine, add MadMachine platform
+  // TODO: add MadMachine to llvm::Triple::OSType or llvm::Triple::VendorType
+  case llvm::Triple::UnknownOS:
+    if (Target.getArch() == llvm::Triple::ArchType::thumb) {
+      addPlatformConditionValue(PlatformConditionKind::OS, "MadMachine");
+    } else {
+      UnsupportedOS = true;
+    }
     break;
   default:
     UnsupportedOS = true;
