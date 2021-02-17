@@ -183,6 +183,20 @@ public:
   ~OpenBSD() = default;
 };
 
+// madmachine, toolchain
+class LLVM_LIBRARY_VISIBILITY MadMachine: public GenericUnix {
+protected:
+  std::string getDefaultLinker() const override;
+  InvocationInfo constructInvocation(const InterpretJobAction &job,
+                                     const JobContext &context) const override;
+  InvocationInfo constructInvocation(const DynamicLinkJobAction &job,
+                                     const JobContext &context) const override;
+public:
+  MadMachine(const Driver &D, const llvm::Triple &Triple)
+      : GenericUnix(D, Triple) {}
+  ~MadMachine() = default;
+};
+
 } // end namespace toolchains
 } // end namespace driver
 } // end namespace swift

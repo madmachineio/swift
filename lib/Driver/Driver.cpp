@@ -335,6 +335,13 @@ Driver::buildToolChain(const llvm::opt::InputArgList &ArgList) {
     return std::make_unique<toolchains::GenericUnix>(*this, target);
   case llvm::Triple::WASI:
     return std::make_unique<toolchains::GenericUnix>(*this, target);
+  // madmachine, add MadMachine toolchain
+  // TODO: add MadMachine to llvm::Triple::OSType or llvm::Triple::VendorType
+  case llvm::Triple::UnknownOS:
+    if (target.getArch() == llvm::Triple::ArchType::thumb) {
+      return std::make_unique<toolchains::MadMachine>(*this, target);
+    }
+    LLVM_FALLTHROUGH;
   default:
     Diags.diagnose(SourceLoc(), diag::error_unknown_target,
                    ArgList.getLastArg(options::OPT_target)->getValue());
