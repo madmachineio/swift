@@ -44,6 +44,17 @@ inline void wasi_call_once(int *flag, void *context, void (*func)(void *)) {
 }
 #endif
 
+// madmachine, call_once implementation
+// TODO: Should be replaced with a thread-safe version
+#if defined(__MADMACHINE__)
+inline void madmachine_call_once(int *flag, void *context, void (*func)(void *)) {
+  if (!*flag) {
+    *flag = 1;
+    func(context);
+  }
+}
+#endif
+
 namespace swift {
 
 #ifdef SWIFT_STDLIB_SINGLE_THREADED_RUNTIME
@@ -66,6 +77,12 @@ namespace swift {
   using OnceToken_t = int;
 # define SWIFT_ONCE_F(TOKEN, FUNC, CONTEXT) \
   ::wasi_call_once(&TOKEN, CONTEXT, FUNC)
+// madmachine, call_once implementation
+// TODO: Should be replaced with a thread-safe version
+#elif defined(__MADMACHINE__)
+  using OnceToken_t = int;
+# define SWIFT_ONCE_F(TOKEN, FUNC, CONTEXT) \
+  ::madmachine_call_once(&TOKEN, CONTEXT, FUNC)
 #else
   using OnceToken_t = std::once_flag;
 # define SWIFT_ONCE_F(TOKEN, FUNC, CONTEXT) \
