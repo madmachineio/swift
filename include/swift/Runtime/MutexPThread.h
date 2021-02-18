@@ -37,6 +37,7 @@ typedef os_unfair_lock MutexHandle;
 typedef pthread_mutex_t MutexHandle;
 #endif
 
+// madmachine, should I add __MADMACHINE__ here
 #if defined(__CYGWIN__) || defined(__ANDROID__) || defined(__HAIKU__) || defined(__wasi__)
 // At the moment CYGWIN pthreads implementation doesn't support the use of
 // constexpr for static allocation versions. The way they define things
