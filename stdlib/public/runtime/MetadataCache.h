@@ -18,7 +18,10 @@
 #include "swift/Runtime/Metadata.h"
 #include "swift/Runtime/Mutex.h"
 #include <condition_variable>
+// madmachine, use pthread instead of cpp thread
+#if !defined(__MADMACHINE__)
 #include <thread>
+#endif
 
 #ifndef SWIFT_DEBUG_RUNTIME
 #define SWIFT_DEBUG_RUNTIME 0
@@ -787,6 +790,12 @@ private:
   using ThreadID = int;
   static ThreadID CurrentThreadID() {
     return 0;
+  }
+  // madmachine, use pthread instead, TODO
+  #elif defined(__MADMACHINE__)
+  using ThreadID = pthread_t
+  static ThreadID CurrentThreadID() {
+    return pthread_self()
   }
   #else
   using ThreadID = std::thread::id;

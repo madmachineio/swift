@@ -24,7 +24,8 @@
 
 // Clang has been defining __INTxx_TYPE__ macros for a long time.
 // __UINTxx_TYPE__ are defined only since Clang 3.5.
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(__OpenBSD__)
+// madmachine, not support
+#if !defined(__APPLE__) && !defined(__linux__) && !defined(__OpenBSD__) && !defined(__MADMACHINE__)
 #include <stdint.h>
 typedef int64_t __swift_int64_t;
 typedef uint64_t __swift_uint64_t;

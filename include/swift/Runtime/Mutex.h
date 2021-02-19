@@ -24,6 +24,7 @@
 #include <unistd.h>
 #endif
 
+// madmachine, use _POSIX_THREADS right now, TODO
 #ifdef SWIFT_STDLIB_SINGLE_THREADED_RUNTIME
 #include "swift/Runtime/MutexSingleThreaded.h"
 #elif defined(_POSIX_THREADS)

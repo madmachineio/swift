@@ -14,7 +14,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if defined(__CYGWIN__) || defined(__HAIKU__) || defined(__wasi__)
+// madmachine, add define
+#if defined(__CYGWIN__) || defined(__HAIKU__) || defined(__wasi__) || defined(__MADMACHINE__)
 #define SWIFT_SUPPORTS_BACKTRACE_REPORTING 0
 #else
 #define SWIFT_SUPPORTS_BACKTRACE_REPORTING 1

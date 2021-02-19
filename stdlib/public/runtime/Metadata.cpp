@@ -41,6 +41,9 @@
 // Avoid defining macro max(), min() which conflict with std::max(), std::min()
 #define NOMINMAX
 #include <windows.h>
+// madmachine, only support unistd.h here
+#elif defined(__MADMACHINE__)
+#include <unistd.h>
 #else
 #include <sys/mman.h>
 #include <unistd.h>
