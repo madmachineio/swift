@@ -21,7 +21,8 @@
 // "/usr/include/x86_64-linux-gnu/sys/types.h:146:10: error: 'stddef.h' file not
 // found"
 // This is a known Clang/Ubuntu bug.
-#if !defined(__APPLE__) && !defined(__linux__)
+// madmachine, not supported
+#if !defined(__APPLE__) && !defined(__linux__) && !defined(__MADMACHINE__)
 #include <stddef.h>
 typedef size_t __swift_size_t;
 #else

@@ -35,7 +35,9 @@
 ///
 /// The minimum possible value for this macro is 1; we always assume
 /// that the null representation is available.
-#define SWIFT_ABI_DEFAULT_LEAST_VALID_POINTER 4096
+//#define SWIFT_ABI_DEFAULT_LEAST_VALID_POINTER 4096
+// madmachine, 
+#define SWIFT_ABI_DEFAULT_LEAST_VALID_POINTER 4
 
 /// The bitmask of spare bits in a function pointer.
 #define SWIFT_ABI_DEFAULT_FUNCTION_SPARE_BITS_MASK 0

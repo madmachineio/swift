@@ -70,6 +70,11 @@ int32_t u_strToUpper(UChar *, int32_t, const UChar *, int32_t, const char *,
 double u_getNumericValue(UChar32);
 }
 
+// madmachine, add simple unicode support
+// https://github.com/swift-embedded/unicode-support
+#elif defined(__MADMACHINE__)
+#include <SimpleUnicodeSupport/include/stdlib_interface.h>
+
 #else
 
 #pragma clang diagnostic push
@@ -89,7 +94,8 @@ double u_getNumericValue(UChar32);
 
 #endif
 
-#if !defined(__APPLE__)
+// madmachine
+#if !defined(__APPLE__) && !defined(__MADMACHINE__)
 #include "swift/Basic/Lazy.h"
 #include "swift/Runtime/Config.h"
 #include "swift/Runtime/Debug.h"

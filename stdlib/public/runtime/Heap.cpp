@@ -45,6 +45,9 @@ using namespace swift;
 #  define MALLOC_ALIGN_MASK 15
 #elif defined(_WIN32)
 #  define MALLOC_ALIGN_MASK 7
+// madmachine, 8-byte(double) aligned on 32-bit
+#elif defined(__MADMACHINE__)
+#  define MALLOC_ALIGN_MASK 7
 
 #else
 // Unknown alignment, but the standard requires alignment suitable for the largest

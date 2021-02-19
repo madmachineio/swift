@@ -22,10 +22,16 @@
 
 #include "../SwiftShims/MetadataSections.h"
 #include "ImageInspection.h"
+
+// madmachine, cancel include dlfcn.h
+#if !defined(__MADMACHINE__)
 #include <dlfcn.h>
+#endif
 
 using namespace swift;
 
+// madmachine, not support lookupSymbol
+#if !defined(__MADMACHINE__)
 int swift::lookupSymbol(const void *address, SymbolInfo *info) {
   Dl_info dlinfo;
   if (dladdr(address, &dlinfo) == 0) {
@@ -38,5 +44,6 @@ int swift::lookupSymbol(const void *address, SymbolInfo *info) {
   info->symbolAddress = dlinfo.dli_saddr;
   return 1;
 }
+#endif
 
 #endif // defined(__ELF__)

@@ -44,6 +44,7 @@
 // In GCC-compatible compilers, we prefer __thread because it's understood
 // to guarantee a constant initializer, which permits more efficient access
 // patterns.
+// madmachine, TODO
 #define SWIFT_RUNTIME_ATTRIBUTE_THREAD_LOCAL __thread
 #else
 // Otherwise, just fall back on the standard C++ feature.

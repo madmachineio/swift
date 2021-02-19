@@ -37,8 +37,8 @@ typedef os_unfair_lock MutexHandle;
 typedef pthread_mutex_t MutexHandle;
 #endif
 
-// madmachine, should I add __MADMACHINE__ here
-#if defined(__CYGWIN__) || defined(__ANDROID__) || defined(__HAIKU__) || defined(__wasi__)
+// madmachine, don't use SWIFT_STDLIB_SINGLE_THREADED_RUNTIME, so we need some change here
+#if defined(__CYGWIN__) || defined(__ANDROID__) || defined(__HAIKU__) || defined(__wasi__) || defined(__MADMACHINE__)
 // At the moment CYGWIN pthreads implementation doesn't support the use of
 // constexpr for static allocation versions. The way they define things
 // results in a reinterpret_cast which violates constexpr. Similarly, Android's

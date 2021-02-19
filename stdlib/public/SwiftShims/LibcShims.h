@@ -94,8 +94,10 @@ static inline __swift_size_t _swift_stdlib_malloc_size(const void *ptr) {
   extern __swift_size_t malloc_size(const void *);
   return malloc_size(ptr);
 }
+// madmachine, add define
 #elif defined(__linux__) || defined(__CYGWIN__) || defined(__ANDROID__) \
-   || defined(__HAIKU__) || defined(__FreeBSD__) || defined(__wasi__)
+   || defined(__HAIKU__) || defined(__FreeBSD__) || defined(__wasi__)   \
+   || defined(__MADMACHINE__)
 #define HAS_MALLOC_SIZE 1
 static inline __swift_size_t _swift_stdlib_malloc_size(const void *ptr) {
 #if defined(__ANDROID__)

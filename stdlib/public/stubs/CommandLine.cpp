@@ -288,6 +288,7 @@ char ** _swift_stdlib_getUnsafeArgvArgc(int *outArgLen) {
 
   return argv_copy;
 }
+// madmachine, TODO
 #else // Add your favorite OS's command line arg grabber here.
 SWIFT_RUNTIME_STDLIB_API
 char **_swift_stdlib_getUnsafeArgvArgc(int *outArgLen) {

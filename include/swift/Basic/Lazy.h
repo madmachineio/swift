@@ -80,7 +80,7 @@ namespace swift {
 // madmachine, call_once implementation
 // TODO: Should be replaced with a thread-safe version
 #elif defined(__MADMACHINE__)
-  using OnceToken_t = int;
+  using OnceToken_t = unsigned int;
 # define SWIFT_ONCE_F(TOKEN, FUNC, CONTEXT) \
   ::madmachine_call_once(&TOKEN, CONTEXT, FUNC)
 #else

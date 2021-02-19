@@ -27,6 +27,8 @@
 #include <errno.h>
 #include <io.h>
 typedef int mode_t;
+// madmachine, not supported
+#elif defined(__MADMACHINE__)
 #else
 #include <semaphore.h>
 #include <sys/ioctl.h>

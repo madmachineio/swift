@@ -335,6 +335,10 @@ swift_stdlib_readLine_stdin(unsigned char **LinePtr) {
   *LinePtr = ReadBuf;
   _unlock_file(stdin);
   return Pos;
+// madmachine, not support getline, TODO
+#elif defined(__MADMACHINE__)
+  assert(0, && "getline not supported");
+  abort();
 #else
   size_t Capacity = 0;
   int result;
@@ -500,7 +504,8 @@ const char *_swift_stdlib_strtof16_clocale(
 void _swift_stdlib_flockfile_stdout() {
 #if defined(_WIN32)
   _lock_file(stdout);
-#elif defined(__wasi__)
+// madmachine, not support flockfile
+#elif defined(__wasi__) || defined(__MADMACHINE__)
   // WebAssembly/WASI doesn't support file locking yet https://bugs.swift.org/browse/SR-12097
 #else
   flockfile(stdout);
@@ -510,7 +515,8 @@ void _swift_stdlib_flockfile_stdout() {
 void _swift_stdlib_funlockfile_stdout() {
 #if defined(_WIN32)
   _unlock_file(stdout);
-#elif defined(__wasi__)
+// madmachine, not support funlockfile
+#elif defined(__wasi__) || defined(__MADMACHINE__)
   // WebAssembly/WASI doesn't support file locking yet https://bugs.swift.org/browse/SR-12097
 #else
   funlockfile(stdout);
@@ -524,6 +530,9 @@ int _swift_stdlib_putc_stderr(int C) {
 size_t _swift_stdlib_getHardwareConcurrency() {
 #ifdef SWIFT_STDLIB_SINGLE_THREADED_RUNTIME
   return 1;
+// madmachine, no hardware concurrency, TODO
+#elif defined(__MADMACHINE__)
+  return 0;
 #else
   return std::thread::hardware_concurrency();
 #endif

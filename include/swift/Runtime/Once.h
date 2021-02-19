@@ -40,7 +40,7 @@ typedef uintptr_t swift_once_t;
 #elif defined(__MADMACHINE__)
 
 // madmachine
-typedef int swift_once_t;
+typedef unsigned int swift_once_t;
 
 #else
 

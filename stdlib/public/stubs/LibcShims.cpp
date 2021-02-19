@@ -47,6 +47,8 @@ __swift_size_t _swift_stdlib_fwrite_stdout(const void *ptr,
     return fwrite(ptr, size, nitems, stdout);
 }
 
+// madmachine, not support read, write, close
+#if !defined(__MADMACHINE__)
 SWIFT_RUNTIME_STDLIB_SPI
 __swift_ssize_t
 _swift_stdlib_read(int fd, void *buf, __swift_size_t nbyte) {
@@ -75,3 +77,4 @@ int _swift_stdlib_close(int fd) {
   return close(fd);
 #endif
 }
+#endif  //__MADMACHINE__
