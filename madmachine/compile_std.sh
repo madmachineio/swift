@@ -3,15 +3,12 @@
 
 
 
-BUILD_TYPE="Ninja-ReleaseAssert+stdlib-Release"
-
-
-
-
 if [ "$(uname)" == "Darwin" ];then
-    OS_TYPE="macos"
+    OS_TYPE="macosx"
+    BUILD_TYPE="Ninja-ReleaseAssert"
 elif [ "$(uname)" == "Linux" ];then
     OS_TYPE="linux"
+    BUILD_TYPE="Ninja-ReleaseAssert+stdlib-Release"
 else
     echo "OS not supported!"
     exit
@@ -20,7 +17,7 @@ fi
 HOST_TYPE="swift-$OS_TYPE-x86_64"
 
 cd ../..
-PROJECT_PATH=$(dirname $(readlink -f $0))
+PROJECT_PATH=$(cd "$(dirname "$0")";pwd)
 
 SOURCE_PATH="$PROJECT_PATH/swift"
 BUILD_PATH="$PROJECT_PATH/build/$BUILD_TYPE/$HOST_TYPE"
