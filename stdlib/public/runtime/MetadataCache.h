@@ -793,9 +793,9 @@ private:
   }
   // madmachine, use pthread instead, TODO
   #elif defined(__MADMACHINE__)
-  using ThreadID = pthread_t
+  using ThreadID = pthread_t;
   static ThreadID CurrentThreadID() {
-    return pthread_self()
+    return pthread_self();
   }
   #else
   using ThreadID = std::thread::id;
