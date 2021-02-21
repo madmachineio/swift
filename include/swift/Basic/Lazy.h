@@ -47,7 +47,7 @@ inline void wasi_call_once(int *flag, void *context, void (*func)(void *)) {
 // madmachine, call_once implementation
 // TODO: Should be replaced with a thread-safe version
 #if defined(__MADMACHINE__)
-inline void madmachine_call_once(int *flag, void *context, void (*func)(void *)) {
+inline void madmachine_call_once(unsigned int *flag, void *context, void (*func)(void *)) {
   if (!*flag) {
     *flag = 1;
     func(context);
