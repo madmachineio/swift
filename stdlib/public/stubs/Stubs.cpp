@@ -43,7 +43,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
-#if defined(__OpenBSD__) || defined(__ANDROID__) || defined(__linux__) || defined(__wasi__) || defined(_WIN32)
+#if defined(__OpenBSD__) || defined(__ANDROID__) || defined(__linux__) || defined(__wasi__) || defined(_WIN32) || defined(__MADMACHINE__)
 #include <locale.h>
 #if defined(_WIN32)
 #define locale_t _locale_t
@@ -337,8 +337,12 @@ swift_stdlib_readLine_stdin(unsigned char **LinePtr) {
   return Pos;
 // madmachine, not support getline, TODO
 #elif defined(__MADMACHINE__)
-  assert(0, && "getline not supported");
-  abort();
+  size_t Capacity = 0;
+  int result;
+  do {
+    result = __getline((char **)LinePtr, &Capacity, stdin);
+  } while (result < 0 && errno == EINTR);
+  return result;
 #else
   size_t Capacity = 0;
   int result;
