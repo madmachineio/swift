@@ -20,7 +20,8 @@
 
 /// SWIFT_RUNTIME_SUPPORTS_THREAD_LOCAL - Does the current configuration
 /// allow the use of SWIFT_RUNTIME_ATTRIBUTE_THREAD_LOCAL?
-#if defined(SWIFT_STDLIB_SINGLE_THREADED_RUNTIME)
+// madmachine, TODO, use single thread version right now
+#if defined(SWIFT_STDLIB_SINGLE_THREADED_RUNTIME) || defined(__MADMACHINE__)
 // We define SWIFT_RUNTIME_ATTRIBUTE_THREAD_LOCAL to nothing in this
 // configuration and just use a global variable, so this is okay.
 #define SWIFT_RUNTIME_SUPPORTS_THREAD_LOCAL 1

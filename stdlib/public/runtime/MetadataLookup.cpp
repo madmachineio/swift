@@ -1013,7 +1013,8 @@ _gatherGenericParameters(const ContextDescriptor *context,
 
       str += "_gatherGenericParameters: context: ";
 
-#if !defined(SWIFT_RUNTIME_MACHO_NO_DYLD)
+// madmachine, no lookupSymbol function
+#if !defined(SWIFT_RUNTIME_MACHO_NO_DYLD) && !defined(__MADMACHINE__)
       SymbolInfo contextInfo;
       if (lookupSymbol(context, &contextInfo)) {
         str += contextInfo.symbolName.get();
