@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-//#define MADMACHINE_PTHREAD_DEBUG
+#define MADMACHINE_PTHREAD_DEBUG
 
 
 
