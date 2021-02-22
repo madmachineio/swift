@@ -257,6 +257,14 @@ static SwiftTLSContext &getTLSContext() {
   return TLSContext;
 }
 
+// madmachine, use single thread version here
+#elif defined(__MADMACHINE__)
+
+static SwiftTLSContext &getTLSContext() {
+  static SwiftTLSContext TLSContext;
+  return TLSContext;
+}
+
 #elif SWIFT_TLS_HAS_RESERVED_PTHREAD_SPECIFIC
 // Use the reserved TSD key if possible.
 

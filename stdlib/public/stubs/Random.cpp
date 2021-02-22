@@ -71,13 +71,13 @@ void swift_stdlib_random(void *buf, __swift_size_t nbytes) {
   }
 }
 
-// madmachine, use zephyr API here
+// madmachine, use zephyr internal API here
 #elif defined(__MADMACHINE__)
-extern "C" void sys_rand_get(void *dst, __swift_size_t len);
+extern "C" void z_impl_sys_rand_get(void *dst, __swift_size_t len);
 
 SWIFT_RUNTIME_STDLIB_API
 void swift_stdlib_random(void *buf, __swift_size_t nbytes) {
-  sys_rand_get(buf, nbytes);
+  z_impl_sys_rand_get(buf, nbytes);
 }
 
 #else
