@@ -30,7 +30,8 @@
 // Android NDK <r21 do not provide `__aeabi_d2h` in the compiler runtime,
 // provide shims in that case.
 #if (defined(__ANDROID__) && defined(__ARM_ARCH_7A__) && defined(__ARM_EABI__)) || \
-  ((defined(__i386__) || defined(__i686__) || defined(__x86_64__)) && !defined(__APPLE__))
+  ((defined(__i386__) || defined(__i686__) || defined(__x86_64__)) && !defined(__APPLE__)) || \
+  (defined(__MADMACHINE__))
 
 #include "../SwiftShims/Visibility.h"
 
@@ -168,6 +169,20 @@ SWIFT_RUNTIME_EXPORT unsigned short __truncdfhf2(double d) {
 SWIFT_RUNTIME_EXPORT unsigned short __aeabi_d2h(double d) {
   return __truncdfhf2(d);
 }
+
+// madmachine, there are implementations of __gnu_*2*_ieee in libgcc, but we just choose the two above
+#if defined(__MADMACHINE__)
+
+SWIFT_RUNTIME_EXPORT float __aeabi_h2f(unsigned short h) {
+  return __gnu_h2f_ieee(h);
+}
+
+SWIFT_RUNTIME_EXPORT unsigned short __aeabi_f2h(float f) {
+  return __gnu_f2h_ieee(f);
+}
+
+#endif
+
 #endif
 
 #endif // defined(__x86_64__) && !defined(__APPLE__)

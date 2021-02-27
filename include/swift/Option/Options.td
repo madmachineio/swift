@@ -1062,6 +1062,10 @@ def print_target_info : Flag<["-"], "print-target-info">,
 def target_cpu : Separate<["-"], "target-cpu">, Flags<[FrontendOption, ModuleInterfaceOption]>,
   HelpText<"Generate code for a particular CPU variant">;
 
+// madmachine, add float-abi support
+def float_abi : Separate<["-"], "float-abi">, Flags<[FrontendOption, ModuleInterfaceOption]>,
+  HelpText<"Generate code for a particular float abi">;
+
 def target_variant : Separate<["-"], "target-variant">,
   Flags<[FrontendOption]>,
   HelpText<"Generate 'zippered' code for macCatalyst that can run on the specified"

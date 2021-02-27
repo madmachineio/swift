@@ -148,7 +148,9 @@ StringRef swift::getPlatformNameForTriple(const llvm::Triple &triple) {
   case llvm::Triple::UnknownOS:
     // madmachine, add MadMachine support for thumb arch
     // TODO: add MadMachine to llvm::Triple::OSType or llvm::Triple::VendorType
-    if (triple.getArch() != llvm::Triple::ArchType::thumb) {
+    if (triple.getArch() == llvm::Triple::ArchType::thumb) {
+      return "madmachine";
+    } else {
       llvm_unreachable("unknown OS");
     }
   case llvm::Triple::Ananas:

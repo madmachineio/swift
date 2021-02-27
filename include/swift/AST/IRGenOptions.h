@@ -319,6 +319,9 @@ public:
   /// Path to the profdata file to be used for PGO, or the empty string.
   std::string UseProfile = "";
 
+  /// madmachine, add FloatABI
+  std::string FloatABI = "";
+
   /// List of backend command-line options for -embed-bitcode.
   std::vector<uint8_t> CmdArgs;
 

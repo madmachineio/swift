@@ -824,6 +824,10 @@ static bool ParseClangImporterArgs(ClangImporterOptions &Opts,
   if (const Arg *A = Args.getLastArg(OPT_target_cpu))
     Opts.TargetCPU = A->getValue();
 
+  // madmachine, clang importer need this to generate target features
+  if (const Arg *A = Args.getLastArg(OPT_float_abi))
+    Opts.TargetFloatABI = A->getValue();
+
   if (const Arg *A = Args.getLastArg(OPT_index_store_path))
     Opts.IndexStorePath = A->getValue();
 
@@ -1450,8 +1454,12 @@ static bool ParseIRGenArgs(IRGenOptions &Opts, ArgList &Args,
   }
 
   Opts.FunctionSections = Args.hasArg(OPT_function_sections);
-  // madmachine
+  // madmachine, set data-sections for IRGenOptions
   Opts.DataSections = Args.hasArg(OPT_data_sections);
+
+  // madmachine, get float-abi value and set to IRGenOptions
+  if (Args.hasArg(OPT_float_abi))
+    Opts.FloatABI = Args.getLastArgValue(OPT_float_abi).str();
 
   if (Args.hasArg(OPT_autolink_force_load))
     Opts.ForceLoadSymbolName = Args.getLastArgValue(OPT_module_link_name).str();
