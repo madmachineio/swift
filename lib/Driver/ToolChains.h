@@ -191,6 +191,8 @@ protected:
                                      const JobContext &context) const override;
   InvocationInfo constructInvocation(const DynamicLinkJobAction &job,
                                      const JobContext &context) const override;
+  InvocationInfo constructInvocation(const StaticLinkJobAction &job,
+                                     const JobContext &context) const override;
 public:
   MadMachine(const Driver &D, const llvm::Triple &Triple)
       : GenericUnix(D, Triple) {}

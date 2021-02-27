@@ -442,6 +442,9 @@ std::string toolchains::OpenBSD::getDefaultLinker() const {
   return "lld";
 }
 
+
+
+
 // madmachine, MadMachine toolchain tools
 std::string toolchains::MadMachine::getDefaultLinker() const {
   return "arm-none-eabi-ld";
@@ -456,5 +459,286 @@ toolchains::MadMachine::constructInvocation(const InterpretJobAction &job,
 ToolChain::InvocationInfo
 toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
                                              const JobContext &context) const {
-  llvm_unreachable("DynamicLinkJobAction not implemented for MadMachine toolchain");
+  assert(context.Output.getPrimaryOutputType() == file_types::TY_Image &&
+         "Invalid linker output type.");
+
+  //madmachine, debug
+  llvm::outs() << "MadMachine::constructInvocatio(DynamicLinkJobAction)\n";
+
+  std::string FloatABI;
+  if (const Arg *A = context.Args.getLastArg(options::OPT_float_abi)) {
+    FloatABI = A->getValue();
+  }
+
+  std::string Enviroment = getTriple().getEnvironmentName().str();
+  if (!FloatABI.empty()) {
+    assert(((FloatABI == "soft" && Enviroment == "eabi")    ||
+            (FloatABI == "hard" && Enviroment == "eabihf")) &&
+            "Invalid float ABI and enviroment combination!");
+  }
+
+  std::string ArchName = getTriple().getArchName().str();
+
+  ArgStringList Arguments;
+
+  llvm::outs() << "context.Args.size() = " << context.Args.size() << "\n";
+  for (auto arg : context.Args) {
+    llvm::outs() << "arg options: " << arg->getOption().getName() << "    ";
+    for (auto value : arg->getValues()) {
+      llvm::outs() << " " << value;
+    }
+    llvm::outs() << "\n";
+  }
+
+  std::string Target = getTargetForLinker();
+  if (!Target.empty()) {
+    Arguments.push_back("-target");
+    Arguments.push_back(context.Args.MakeArgString(Target));
+  }
+
+  switch (job.getKind()) {
+  case LinkKind::None:
+    llvm_unreachable("invalid link kind");
+  case LinkKind::Executable:
+    // Default case, nothing extra needed.
+    break;
+  case LinkKind::DynamicLibrary:
+    llvm_unreachable("invalid link kind");
+  case LinkKind::StaticLibrary:
+    llvm_unreachable("the dynamic linker cannot build static libraries");
+  }
+
+  // Select the linker to use.
+  std::string Linker;
+  if (context.OI.LTOVariant != OutputInfo::LTOKind::None) {
+    // Force to use lld for LTO on Unix-like platform (not including Darwin)
+    // because we don't support gold LTO or something else except for lld LTO
+    // at this time.
+    Linker = "ld";
+  }
+
+  if (const Arg *A = context.Args.getLastArg(options::OPT_use_ld)) {
+    Linker = A->getValue();
+  }
+
+  if (Linker.empty()) {
+    Linker = getDefaultLinker();
+  }
+  if (!Linker.empty()) {
+    Arguments.push_back(context.Args.MakeArgString("-fuse-ld=" + Linker));
+  }
+
+  // Configure the toolchain.
+  if (const Arg *A = context.Args.getLastArg(options::OPT_tools_directory)) {
+    StringRef toolchainPath(A->getValue());
+
+    // Look for binutils in the toolchain folder.
+    Arguments.push_back("-B");
+    Arguments.push_back(context.Args.MakeArgString(A->getValue()));
+  }
+
+  if (getTriple().getObjectFormat() == llvm::Triple::ELF &&
+      job.getKind() == LinkKind::Executable &&
+      !context.Args.hasFlag(options::OPT_static_executable,
+                            options::OPT_no_static_executable, false)) {
+    Arguments.push_back("-pie");
+  }
+
+  switch (context.OI.LTOVariant) {
+  case OutputInfo::LTOKind::LLVMThin:
+    Arguments.push_back("-flto=thin");
+    break;
+  case OutputInfo::LTOKind::LLVMFull:
+    Arguments.push_back("-flto=full");
+    break;
+  case OutputInfo::LTOKind::None:
+    break;
+  }
+
+  bool staticExecutable = false;
+  bool staticStdlib = false;
+
+  if (context.Args.hasFlag(options::OPT_static_executable,
+                           options::OPT_no_static_executable, false)) {
+    staticExecutable = true;
+  } else if (context.Args.hasFlag(options::OPT_static_stdlib,
+                                  options::OPT_no_static_stdlib, false)) {
+    staticStdlib = true;
+  }
+
+  SmallVector<std::string, 4> RuntimeLibPaths;
+  getRuntimeLibraryPaths(RuntimeLibPaths, context.Args, context.OI.SDKPath,
+                         /*Shared=*/!(staticExecutable || staticStdlib));
+
+  if (addRuntimeRPath(getTriple(), context.Args)) {
+    for (auto path : RuntimeLibPaths) {
+      Arguments.push_back("-Xlinker");
+      Arguments.push_back("-rpath");
+      Arguments.push_back("-Xlinker");
+      Arguments.push_back(context.Args.MakeArgString(path));
+    }
+  }
+
+  SmallString<128> StaticResourceDirPath;
+  getResourceDirPath(StaticResourceDirPath, context.Args, /*Shared=*/false);
+
+  SmallString<128> swiftrtPath = StaticResourceDirPath;
+  llvm::sys::path::append(swiftrtPath, ArchName, Enviroment, "swiftrt.o");
+  Arguments.push_back(context.Args.MakeArgString(swiftrtPath));
+  //madmachine, debug
+  llvm::outs() << "swiftrtPath = " << swiftrtPath << "\n";
+
+
+  SmallString<128> envLibPath = StaticResourceDirPath;
+  llvm::sys::path::append(envLibPath, ArchName, Enviroment);
+  RuntimeLibPaths.push_back(std::string(envLibPath.str()));
+
+  llvm::outs() << "envLibPath = " << envLibPath << "\n";
+
+  addPrimaryInputsOfType(Arguments, context.Inputs, context.Args,
+                         file_types::TY_Object);
+  addPrimaryInputsOfType(Arguments, context.Inputs, context.Args,
+                         file_types::TY_LLVM_BC);
+  addInputsOfType(Arguments, context.InputActions, file_types::TY_Object);
+  addInputsOfType(Arguments, context.InputActions, file_types::TY_LLVM_BC);
+
+  for (const Arg *arg :
+       context.Args.filtered(options::OPT_F, options::OPT_Fsystem)) {
+    if (arg->getOption().matches(options::OPT_Fsystem))
+      Arguments.push_back("-iframework");
+    else
+      Arguments.push_back(context.Args.MakeArgString(arg->getSpelling()));
+    Arguments.push_back(arg->getValue());
+  }
+
+  if (!context.OI.SDKPath.empty()) {
+    Arguments.push_back("--sysroot");
+    Arguments.push_back(context.Args.MakeArgString(context.OI.SDKPath));
+  }
+
+
+  // Add any autolinking scripts to the arguments
+  for (const Job *Cmd : context.Inputs) {
+    auto &OutputInfo = Cmd->getOutput();
+    if (OutputInfo.getPrimaryOutputType() == file_types::TY_AutolinkFile)
+      Arguments.push_back(context.Args.MakeArgString(
+          Twine("@") + OutputInfo.getPrimaryOutputFilename()));
+  }
+
+  // Add the runtime library link paths.
+  for (auto path : RuntimeLibPaths) {
+    // madmachine, debug
+    llvm::outs() << "RuntimeLibPaths = " << path << "\n";
+    Arguments.push_back("-L");
+    Arguments.push_back(context.Args.MakeArgString(path));
+  }
+
+  // Link the standard library. In two paths, we do this using a .lnk file;
+  // if we're going that route, we'll set `linkFilePath` to the path to that
+  // file.
+  SmallString<128> linkFilePath;
+  getResourceDirPath(linkFilePath, context.Args, /*Shared=*/false);
+
+  if (staticExecutable) {
+    llvm::sys::path::append(linkFilePath, "static-executable-args.lnk");
+  } else if (staticStdlib) {
+    llvm::sys::path::append(linkFilePath, "static-stdlib-args.lnk");
+  } else {
+    linkFilePath.clear();
+    Arguments.push_back("-lswiftCore");
+  }
+
+  if (!linkFilePath.empty()) {
+    auto linkFile = linkFilePath.str();
+    if (llvm::sys::fs::is_regular_file(linkFile)) {
+      Arguments.push_back(context.Args.MakeArgString(Twine("@") + linkFile));
+    } else {
+      llvm::report_fatal_error(linkFile + " not found");
+    }
+  }
+
+  // Link against the desired C++ standard library.
+  if (const Arg *A =
+          context.Args.getLastArg(options::OPT_experimental_cxx_stdlib)) {
+    Arguments.push_back(
+        context.Args.MakeArgString(Twine("-stdlib=") + A->getValue()));
+  }
+
+  // Explicitly pass the target to the linker
+  Arguments.push_back(
+      context.Args.MakeArgString("--target=" + getTriple().str()));
+
+  // Delegate to Clang for sanitizers. It will figure out the correct linker
+  // options.
+  if (job.getKind() == LinkKind::Executable && context.OI.SelectedSanitizers) {
+    Arguments.push_back(context.Args.MakeArgString(
+        "-fsanitize=" + getSanitizerList(context.OI.SelectedSanitizers)));
+
+    // The TSan runtime depends on the blocks runtime and libdispatch.
+    if (context.OI.SelectedSanitizers & SanitizerKind::Thread) {
+      Arguments.push_back("-lBlocksRuntime");
+      Arguments.push_back("-ldispatch");
+    }
+  }
+
+  if (context.Args.hasArg(options::OPT_profile_generate)) {
+    SmallString<128> LibProfile(StaticResourceDirPath);
+    llvm::sys::path::remove_filename(LibProfile); // remove platform name
+    llvm::sys::path::append(LibProfile, "clang", "lib");
+
+    llvm::sys::path::append(LibProfile, getTriple().getOSName(),
+                            Twine("libclang_rt.profile-") +
+                                ArchName + ".a");
+    Arguments.push_back(context.Args.MakeArgString(LibProfile));
+    Arguments.push_back(context.Args.MakeArgString(
+        Twine("-u", llvm::getInstrProfRuntimeHookVarName())));
+  }
+
+  // Run clang in verbose mode if "-v" is set
+  if (context.Args.hasArg(options::OPT_v)) {
+    Arguments.push_back("-v");
+  }
+
+  // These custom arguments should be right before the object file at the end.
+  context.Args.AddAllArgs(Arguments, options::OPT_linker_option_Group);
+  context.Args.AddAllArgs(Arguments, options::OPT_Xlinker);
+  context.Args.AddAllArgValues(Arguments, options::OPT_Xclang_linker);
+
+  // This should be the last option, for convenience in checking output.
+  Arguments.push_back("-o");
+  Arguments.push_back(
+      context.Args.MakeArgString(context.Output.getPrimaryOutputFilename()));
+
+  InvocationInfo II{getClangLinkerDriver(context.Args), Arguments};
+  II.allowsResponseFiles = true;
+
+  return II;
+}
+
+ToolChain::InvocationInfo
+toolchains::MadMachine::constructInvocation(const StaticLinkJobAction &job,
+                               const JobContext &context) const {
+   assert(context.Output.getPrimaryOutputType() == file_types::TY_Image &&
+         "Invalid linker output type.");
+
+  ArgStringList Arguments;
+
+  // Configure the toolchain.
+  const char *AR =
+      context.OI.LTOVariant != OutputInfo::LTOKind::None ? "llvm-ar" : "arm-none-eabi-ar";
+  Arguments.push_back("crs");
+
+  Arguments.push_back(
+      context.Args.MakeArgString(context.Output.getPrimaryOutputFilename()));
+
+  addPrimaryInputsOfType(Arguments, context.Inputs, context.Args,
+                         file_types::TY_Object);
+  addPrimaryInputsOfType(Arguments, context.Inputs, context.Args,
+                         file_types::TY_LLVM_BC);
+  addInputsOfType(Arguments, context.InputActions, file_types::TY_Object);
+  addInputsOfType(Arguments, context.InputActions, file_types::TY_LLVM_BC);
+
+  InvocationInfo II{AR, Arguments};
+
+  return II;
 }

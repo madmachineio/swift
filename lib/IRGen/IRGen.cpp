@@ -169,6 +169,19 @@ swift::getIRTargetOptions(const IRGenOptions &Opts, ASTContext &Ctx) {
   // madmachine
   TargetOpts.DataSections = Opts.DataSections;
 
+  // madswift, set float ABI type.
+  assert((Opts.FloatABI == "soft" ||
+          //Opts.FloatABI == "softfp" ||
+          Opts.FloatABI == "hard" ||
+          Opts.FloatABI.empty())  &&
+          "Invalid Floating Point ABI!");
+  TargetOpts.FloatABIType =
+    llvm::StringSwitch<llvm::FloatABI::ABIType>(Opts.FloatABI)
+      .Case("soft", llvm::FloatABI::Soft)
+      //.Case("softfp", llvm::FloatABI::SoftFP)
+      .Case("hard", llvm::FloatABI::Hard)
+      .Default(llvm::FloatABI::Default);
+
   auto *Clang = static_cast<ClangImporter *>(Ctx.getClangModuleLoader());
 
   // WebAssembly doesn't support atomics yet, see https://bugs.swift.org/browse/SR-12097
@@ -753,6 +766,14 @@ swift::createTargetMachine(const IRGenOptions &Opts, ASTContext &Ctx) {
   Optional<CodeModel::Model> cmodel = None;
   if (EffectiveTriple.isArch64Bit() && EffectiveTriple.isWindowsCygwinEnvironment())
     cmodel = CodeModel::Large;
+
+  //madmachine
+  llvm::outs() << "lib/IRGen/IRGen.cpp createTargetMachine(), EffectiveTriple = " << EffectiveTriple.str() << "\n";
+  llvm::outs() << "                                                 CPU = " << CPU << "\n";
+  llvm::outs() << "                                                 targetFeatures = " << targetFeatures << "\n";
+  llvm::outs() << "                                                 TargetOpts.FloatABIType = " << TargetOpts.FloatABIType << "\n";
+  llvm::outs() << "                                                 TargetOpts.FunctionSections = " << TargetOpts.FunctionSections << "\n";
+  llvm::outs() << "                                                 TargetOpts.DataSections = " << TargetOpts.DataSections << "\n";
 
   // Create a target machine.
   llvm::TargetMachine *TargetMachine = Target->createTargetMachine(

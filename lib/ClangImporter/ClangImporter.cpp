@@ -769,6 +769,11 @@ importer::addCommonInvocationArguments(
     invocationArgStrs.push_back("-march=z13");
   }
 
+  // madmachine, add -mfloat-abi
+  if (!importerOpts.TargetFloatABI.empty()) {
+    invocationArgStrs.push_back("-mfloat-abi=" + importerOpts.TargetFloatABI);
+  }
+
   if (!importerOpts.Optimization.empty()) {
     invocationArgStrs.push_back(importerOpts.Optimization);
   }

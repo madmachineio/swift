@@ -576,6 +576,9 @@ namespace swift {
     /// Equivalent to Clang's -mcpu=.
     std::string TargetCPU;
 
+    /// madmachine, equivalent to Clang's -mfloat-abi=.
+    std::string TargetFloatABI;
+    
     /// The path to which we should store indexing data, if any.
     std::string IndexStorePath;
 
@@ -656,6 +659,8 @@ namespace swift {
                           hash_combine_range(ExtraArgs.begin(), ExtraArgs.end()),
                           OverrideResourceDir,
                           TargetCPU,
+                          // madmachine
+                          TargetFloatABI,
                           BridgingHeader,
                           PrecompiledHeaderOutputDir,
                           static_cast<uint8_t>(Mode),
