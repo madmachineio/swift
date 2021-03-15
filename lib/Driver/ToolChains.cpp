@@ -1373,35 +1373,6 @@ void ToolChain::getSecondaryResourceDirPath(
   llvm::sys::path::remove_filename(secondaryResourceDirPath);
   llvm::sys::path::append(secondaryResourceDirPath, "macosx");
 }
-/*
-void ToolChain::getRuntimeLibraryPaths(SmallVectorImpl<std::string> &runtimeLibPaths,
-                                       const llvm::opt::ArgList &args,
-                                       StringRef SDKPath, bool shared) const {
-  SmallString<128> scratchPath;
-  getResourceDirPath(scratchPath, args, shared);
-  runtimeLibPaths.push_back(std::string(scratchPath.str()));
-
-  // If there's a secondary resource dir, add it too.
-  scratchPath.clear();
-  getSecondaryResourceDirPath(scratchPath, runtimeLibPaths[0]);
-  if (!scratchPath.empty())
-    runtimeLibPaths.push_back(std::string(scratchPath.str()));
-
-  if (!SDKPath.empty()) {
-    if (!scratchPath.empty()) {
-      // If we added the secondary resource dir, we also need the iOSSupport
-      // directory.
-      scratchPath = SDKPath;
-      llvm::sys::path::append(scratchPath, "System", "iOSSupport");
-      llvm::sys::path::append(scratchPath, "usr", "lib", "swift");
-      runtimeLibPaths.push_back(std::string(scratchPath.str()));
-    }
-
-    scratchPath = SDKPath;
-    llvm::sys::path::append(scratchPath, "usr", "lib", "swift");
-    runtimeLibPaths.push_back(std::string(scratchPath.str()));
-  }
-}*/
 
 void ToolChain::getRuntimeLibraryPaths(SmallVectorImpl<std::string> &runtimeLibPaths,
                                        const llvm::opt::ArgList &args,
@@ -1415,7 +1386,6 @@ void ToolChain::getRuntimeLibraryPaths(SmallVectorImpl<std::string> &runtimeLibP
   getSecondaryResourceDirPath(scratchPath, runtimeLibPaths[0]);
   if (!scratchPath.empty())
     runtimeLibPaths.push_back(std::string(scratchPath.str()));
-
 
   if (!SDKPath.empty()) {
     if (!scratchPath.empty()) {
