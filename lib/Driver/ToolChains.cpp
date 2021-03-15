@@ -1340,18 +1340,15 @@ void ToolChain::getResourceDirPath(SmallVectorImpl<char> &resourceDirPath,
   if (const Arg *A = args.getLastArg(options::OPT_resource_dir)) {
     StringRef value = A->getValue();
     resourceDirPath.append(value.begin(), value.end());
-    llvm::outs() << "    getResourceDirPath: OPT_resource_dir" << "\n";
   } else if (!getTriple().isOSDarwin() && args.hasArg(options::OPT_sdk)) {
     StringRef value = args.getLastArg(options::OPT_sdk)->getValue();
     resourceDirPath.append(value.begin(), value.end());
     llvm::sys::path::append(resourceDirPath, "usr");
     CompilerInvocation::appendSwiftLibDir(resourceDirPath, shared);
-    llvm::outs() << "    getResourceDirPath: OPT_sdk" << "\n";
   } else {
     auto programPath = getDriver().getSwiftProgramPath();
     CompilerInvocation::computeRuntimeResourcePathFromExecutablePath(
         programPath, shared, resourceDirPath);
-    llvm::outs() << "    getResourceDirPath: OPT_else : (" << "\n";
   }
 
   StringRef libSubDir = getPlatformNameForTriple(getTriple());
@@ -1409,13 +1406,9 @@ void ToolChain::getRuntimeLibraryPaths(SmallVectorImpl<std::string> &runtimeLibP
 void ToolChain::getRuntimeLibraryPaths(SmallVectorImpl<std::string> &runtimeLibPaths,
                                        const llvm::opt::ArgList &args,
                                        StringRef SDKPath, bool shared) const {
-  llvm::outs() << "MadMachine::getRuntimeLibraryPaths\n";
   SmallString<128> scratchPath;
   getResourceDirPath(scratchPath, args, shared);
   runtimeLibPaths.push_back(std::string(scratchPath.str()));
-
-
-  llvm::outs() << "    getResourceDirPath result = " << scratchPath << "\n";
 
   // If there's a secondary resource dir, add it too.
   scratchPath.clear();
@@ -1423,7 +1416,6 @@ void ToolChain::getRuntimeLibraryPaths(SmallVectorImpl<std::string> &runtimeLibP
   if (!scratchPath.empty())
     runtimeLibPaths.push_back(std::string(scratchPath.str()));
 
-  llvm::outs() << "    getSecondaryResourceDirPath = " << scratchPath << "\n";
 
   if (!SDKPath.empty()) {
     if (!scratchPath.empty()) {
@@ -1433,19 +1425,12 @@ void ToolChain::getRuntimeLibraryPaths(SmallVectorImpl<std::string> &runtimeLibP
       llvm::sys::path::append(scratchPath, "System", "iOSSupport");
       llvm::sys::path::append(scratchPath, "usr", "lib", "swift");
       runtimeLibPaths.push_back(std::string(scratchPath.str()));
-      llvm::outs() << "    SDKPath0 if not empty: " << scratchPath << "\n";
     }
 
     scratchPath = SDKPath;
     llvm::sys::path::append(scratchPath, "usr", "lib", "swift");
     runtimeLibPaths.push_back(std::string(scratchPath.str()));
-
-    llvm::outs() << "    SDKPath1" << scratchPath << "\n";
   }
-
-    for (auto path : runtimeLibPaths) {
-      llvm::outs() << "    runtimeLibPaths lists = " << path << "\n";
-    }
 }
 
 const char *ToolChain::getClangLinkerDriver(

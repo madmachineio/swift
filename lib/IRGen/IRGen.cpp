@@ -166,7 +166,7 @@ swift::getIRTargetOptions(const IRGenOptions &Opts, ASTContext &Ctx) {
   TargetOpts.DebuggerTuning = llvm::DebuggerKind::LLDB;
   TargetOpts.FunctionSections = Opts.FunctionSections;
 
-  // madmachine
+  // madmachine, add data sections support
   TargetOpts.DataSections = Opts.DataSections;
 
   // madswift, set float ABI type.
@@ -767,13 +767,13 @@ swift::createTargetMachine(const IRGenOptions &Opts, ASTContext &Ctx) {
   if (EffectiveTriple.isArch64Bit() && EffectiveTriple.isWindowsCygwinEnvironment())
     cmodel = CodeModel::Large;
 
-  //madmachine
-  llvm::outs() << "lib/IRGen/IRGen.cpp createTargetMachine(), EffectiveTriple = " << EffectiveTriple.str() << "\n";
-  llvm::outs() << "                                                 CPU = " << CPU << "\n";
-  llvm::outs() << "                                                 targetFeatures = " << targetFeatures << "\n";
-  llvm::outs() << "                                                 TargetOpts.FloatABIType = " << TargetOpts.FloatABIType << "\n";
-  llvm::outs() << "                                                 TargetOpts.FunctionSections = " << TargetOpts.FunctionSections << "\n";
-  llvm::outs() << "                                                 TargetOpts.DataSections = " << TargetOpts.DataSections << "\n";
+  //madmachine, debug
+  //llvm::outs() << "lib/IRGen/IRGen.cpp createTargetMachine(), EffectiveTriple = " << EffectiveTriple.str() << "\n";
+  //llvm::outs() << "                                                 CPU = " << CPU << "\n";
+  //llvm::outs() << "                                                 targetFeatures = " << targetFeatures << "\n";
+  //llvm::outs() << "                                                 TargetOpts.FloatABIType = " << TargetOpts.FloatABIType << "\n";
+  //llvm::outs() << "                                                 TargetOpts.FunctionSections = " << TargetOpts.FunctionSections << "\n";
+  //llvm::outs() << "                                                 TargetOpts.DataSections = " << TargetOpts.DataSections << "\n";
 
   // Create a target machine.
   llvm::TargetMachine *TargetMachine = Target->createTargetMachine(
