@@ -447,7 +447,7 @@ std::string toolchains::OpenBSD::getDefaultLinker() const {
 
 // madmachine, MadMachine toolchain tools
 std::string toolchains::MadMachine::getDefaultLinker() const {
-  return "arm-none-eabi-ld";
+  return findProgramRelativeToSwift("arm-none-eabi-ld");
 }
 
 ToolChain::InvocationInfo
@@ -463,7 +463,7 @@ toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
          "Invalid linker output type.");
 
   //madmachine, debug
-  llvm::outs() << "MadMachine::constructInvocatio(DynamicLinkJobAction)\n";
+  //llvm::outs() << "MadMachine::constructInvocatio(DynamicLinkJobAction)\n";
 
   std::string FloatABI;
   if (const Arg *A = context.Args.getLastArg(options::OPT_float_abi)) {
@@ -475,20 +475,13 @@ toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
     assert(((FloatABI == "soft" && Enviroment == "eabi")    ||
             (FloatABI == "hard" && Enviroment == "eabihf")) &&
             "Invalid float ABI and enviroment combination!");
+  } else {
+    llvm_unreachable("Must specify float-abi at present");
   }
 
   std::string ArchName = getTriple().getArchName().str();
 
   ArgStringList Arguments;
-
-  llvm::outs() << "context.Args.size() = " << context.Args.size() << "\n";
-  for (auto arg : context.Args) {
-    llvm::outs() << "arg options: " << arg->getOption().getName() << "    ";
-    for (auto value : arg->getValues()) {
-      llvm::outs() << " " << value;
-    }
-    llvm::outs() << "\n";
-  }
 
   std::string Target = getTargetForLinker();
   if (!Target.empty()) {
@@ -514,7 +507,7 @@ toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
     // Force to use lld for LTO on Unix-like platform (not including Darwin)
     // because we don't support gold LTO or something else except for lld LTO
     // at this time.
-    Linker = "ld";
+    Linker = "lld";
   }
 
   if (const Arg *A = context.Args.getLastArg(options::OPT_use_ld)) {
@@ -585,15 +578,17 @@ toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
   SmallString<128> swiftrtPath = StaticResourceDirPath;
   llvm::sys::path::append(swiftrtPath, ArchName, Enviroment, "swiftrt.o");
   Arguments.push_back(context.Args.MakeArgString(swiftrtPath));
+
   //madmachine, debug
-  llvm::outs() << "swiftrtPath = " << swiftrtPath << "\n";
+  //llvm::outs() << "swiftrtPath = " << swiftrtPath << "\n";
 
 
   SmallString<128> envLibPath = StaticResourceDirPath;
   llvm::sys::path::append(envLibPath, ArchName, Enviroment);
   RuntimeLibPaths.push_back(std::string(envLibPath.str()));
 
-  llvm::outs() << "envLibPath = " << envLibPath << "\n";
+  //madmachine, debug
+  //llvm::outs() << "envLibPath = " << envLibPath << "\n";
 
   addPrimaryInputsOfType(Arguments, context.Inputs, context.Args,
                          file_types::TY_Object);
@@ -628,7 +623,7 @@ toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
   // Add the runtime library link paths.
   for (auto path : RuntimeLibPaths) {
     // madmachine, debug
-    llvm::outs() << "RuntimeLibPaths = " << path << "\n";
+    //llvm::outs() << "RuntimeLibPaths = " << path << "\n";
     Arguments.push_back("-L");
     Arguments.push_back(context.Args.MakeArgString(path));
   }
@@ -737,6 +732,9 @@ toolchains::MadMachine::constructInvocation(const StaticLinkJobAction &job,
                          file_types::TY_LLVM_BC);
   addInputsOfType(Arguments, context.InputActions, file_types::TY_Object);
   addInputsOfType(Arguments, context.InputActions, file_types::TY_LLVM_BC);
+
+  //madmachine, debug
+  //llvm::outs() << "ar bin = " << AR << "\n";
 
   InvocationInfo II{AR, Arguments};
 
