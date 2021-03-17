@@ -94,8 +94,4 @@ cat << EOF > $BUILD_PATH/lib/swift_static/madmachine/static-stdlib-args.lnk
 EOF
 
 cp -f $BUILD_PATH/lib/swift_static/madmachine/static-stdlib-args.lnk $BUILD_PATH/lib/swift_static/madmachine/static-executable-args.lnk
-
-
-
-
 cp -rf $BUILD_PATH/lib/swift/shims $BUILD_PATH/lib/swift_static
