@@ -611,6 +611,13 @@ toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
     Arguments.push_back(context.Args.MakeArgString(context.OI.SDKPath));
   }
 
+  // If we are linking statically, we need to add all
+  // dependencies to a library search group to resolve
+  // potential circular dependencies
+  if (staticExecutable || staticStdlib) {
+    Arguments.push_back("-Xlinker");
+    Arguments.push_back("--start-group");
+  }
 
   // Add any autolinking scripts to the arguments
   for (const Job *Cmd : context.Inputs) {
@@ -618,6 +625,11 @@ toolchains::MadMachine::constructInvocation(const DynamicLinkJobAction &job,
     if (OutputInfo.getPrimaryOutputType() == file_types::TY_AutolinkFile)
       Arguments.push_back(context.Args.MakeArgString(
           Twine("@") + OutputInfo.getPrimaryOutputFilename()));
+  }
+
+  if (staticExecutable || staticStdlib) {
+    Arguments.push_back("-Xlinker");
+    Arguments.push_back("--end-group");
   }
 
   // Add the runtime library link paths.
