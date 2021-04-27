@@ -3,7 +3,7 @@
     "https-clone-pattern": "https://github.com/%s.git",
     "repos" : {
        "swift": {
-            "remote": { "id": "apple/swift" } },
+            "remote": { "id": "madmachineio/swift" } },
        "cmark": {
             "remote": { "id": "apple/swift-cmark" } },
         "llbuild": {
@@ -13,9 +13,9 @@
         "swift-driver": {
             "remote": { "id": "apple/swift-driver" } },
         "swift-tools-support-core": {
-            "remote": { "id": "apple/swift-tools-support-core" } },
+            "remote": { "id": "madmachineio/swift-tools-support-core" } },
         "swiftpm": {
-            "remote": { "id": "apple/swift-package-manager" } },
+            "remote": { "id": "madmachineio/swift-package-manager" } },
         "swift-syntax": {
             "remote": { "id": "apple/swift-syntax" } },
         "swift-stress-tester": {
@@ -341,9 +341,9 @@
                 "swift": "mm/5.4",
                 "cmark": "release/5.4",
                 "llbuild": "release/5.4",
-                "swift-tools-support-core": "release/5.4",
-                "swiftpm": "release/5.4",
-                "swift-argument-parser": "0.3.0",
+                "swift-tools-support-core": "mm/5.4",
+                "swiftpm": "mm/5.4",
+                "swift-argument-parser": "0.4.1",
                 "swift-driver": "release/5.4",
                 "swift-syntax": "release/5.4",
                 "swift-stress-tester": "release/5.4",
@@ -354,7 +354,7 @@
                 "swift-xcode-playground-support": "release/5.4",
                 "ninja": "release",
                 "icu": "release-65-1",
-                "yams": "3.0.1",
+                "yams": "4.0.2",
                 "cmake": "v3.16.5",
                 "indexstore-db": "release/5.4",
                 "sourcekit-lsp": "release/5.4",
